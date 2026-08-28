@@ -6,10 +6,10 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="One More Thing, Roy… ❤️">
 <meta property="og:description" content="A little something before you go.">
-<meta property="og:image" content="https://TanviParekhIndia.github.io/roy-before-you-go/Roy_Walker_WhatsApp_Preview_Updated.jpg">
+<meta property="og:image" content="https://TanviParekhIndia.github.io/roy-one-more-thing/Roy_Walker_WhatsApp_Preview_Updated.jpg">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
-<meta property="og:url" content="https://TanviParekhIndia.github.io/roy-before-you-go/">
+<meta property="og:url" content="https://TanviParekhIndia.github.io/roy-one-more-thing/">
 <meta name="twitter:card" content="summary_large_image">
 
 <title>One More Thing, Roy, Before You Go</title>
@@ -80,10 +80,18 @@ body.ending .screen {
     transition: opacity 1.6s ease, visibility 1.6s ease;
 }
 
+
+.vgroup-line {
+    display: block;
+    position: relative;
+    top: -10px;
+}
+
 </style>
 </head>
 
 <body>
+<audio id="clickAudio" preload="auto"><source src="matthewvakaliuk73627-mouse-click-290204.mp3" type="audio/mpeg"></audio>
 <audio id="bgMusic" preload="auto" loop>
 <source src="the_mountain-farewell-piano-146119.mp3" type="audio/mpeg">
 </audio>
@@ -164,7 +172,7 @@ body.ending .screen {
 <div class="quote">“People move on, roles change and chapters end… but the impact we leave on people stays.”</div>
 <p>I'm genuinely glad our paths crossed at VGroup.</p>
 <div class="signature">Wishing you nothing but the very best, Roy. ❤️<br><br><strong>Tanvi</strong></div>
-<p class="small" style="margin-top:28px">VGroup will definitely feel a little different without you.</p>
+<p class="small" style="margin-top:28px"><span class="vgroup-line">VGroup will definitely feel a little different without you.</span></p>
 </div>
 </div>
 
@@ -202,34 +210,54 @@ function updateNav(){
     next.textContent=current===total-1 ? "Finish ✨" : "Next →";
 }
 
-function go(n,opening=false){
-    if(current===total-1 && n===total){
+function go(n, opening=false){
+    // Opening screen: only the "Open your surprise" action is allowed.
+    if(opening){
+        playClick();
+        startFarewellMusic();
+
+        const nav = document.getElementById("nav");
+        if(nav) nav.classList.remove("hidden");
+
+        document.getElementById("s"+current).classList.remove("active");
+        current = 1;
+        document.getElementById("s"+current).classList.add("active");
+        updateNav();
+        return;
+    }
+
+    // Finish from the final screen.
+    if(current === total - 1 && n >= total){
         finishExperience();
         return;
     }
 
-    if(n<0 || n>=total) return;
+    if(n < 0 || n >= total) return;
+
+    playClick();
 
     document.getElementById("s"+current).classList.remove("active");
-    current=n;
+    current = n;
     document.getElementById("s"+current).classList.add("active");
 
-    // Navigation is hidden only on the opening screen.
-    // As soon as Roy opens the surprise, show Back/Next navigation.
-    if(current > 0){
-        document.getElementById("nav").classList.remove("hidden");
-    }
+    const nav = document.getElementById("nav");
+    if(nav && current > 0) nav.classList.remove("hidden");
 
     updateNav();
 
-    if(opening || current===total-1) confetti();
+    if(current === total - 1) confetti();
 }
 
 function finishExperience(){
     playClick();
     stopFarewellMusic();
-    document.getElementById("nav").style.opacity="0";
-    document.getElementById("nav").style.pointerEvents="none";
+
+    const nav = document.getElementById("nav");
+    if(nav){
+        nav.style.opacity = "0";
+        nav.style.pointerEvents = "none";
+    }
+
     document.body.classList.add("ending");
 }
 
@@ -254,82 +282,46 @@ document.addEventListener("keydown",e=>{
 
 updateNav();
 
-const bgMusic = document.getElementById("bgMusic");
-const clickAudio = document.getElementById("clickSound");
 
-if (bgMusic) {
-    bgMusic.volume = 0.32;
-}
-if (clickAudio) {
-    clickAudio.volume = 0.65;
-}
-
-function clickSound() {
-    if (!clickAudio) return;
-    clickAudio.currentTime = 0;
-    clickAudio.play().catch(() => {});
-}
-
-function startFarewellMusic() {
-    if (!bgMusic) return;
-    bgMusic.volume = 0;
-    const playPromise = bgMusic.play();
-    if (playPromise) {
-        playPromise.then(() => {
-            let v = 0;
-            const fade = setInterval(() => {
-                v += 0.02;
-                bgMusic.volume = Math.min(0.32, v);
-                if (v >= 0.32) clearInterval(fade);
-            }, 100);
-        }).catch(() => {});
-    }
-}
-
-function stopFarewellMusic() {
-    if (!bgMusic) return;
-    let v = bgMusic.volume;
-    const fade = setInterval(() => {
-        v -= 0.025;
-        bgMusic.volume = Math.max(0, v);
-        if (v <= 0) {
-            clearInterval(fade);
-            bgMusic.pause();
-            bgMusic.currentTime = 0;
-        }
-    }, 100);
-}
 
 
 /* Real audio files: soft farewell piano + mouse click. */
+
+
+
 const bgMusic = document.getElementById("bgMusic");
 const clickAudio = document.getElementById("clickAudio");
 
 if (bgMusic) bgMusic.volume = 0.30;
 if (clickAudio) clickAudio.volume = 0.75;
 
-function playClick() {
-    if (!clickAudio) return;
-    clickAudio.currentTime = 0;
-    clickAudio.play().catch(() => {});
+function playClick(){
+    const audio = document.getElementById("clickAudio");
+    if(!audio) return;
+    try{
+        audio.pause();
+        audio.currentTime = 0;
+        const p = audio.play();
+        if(p) p.catch(()=>{});
+    }catch(e){}
 }
 
-function startFarewellMusic() {
-    if (!bgMusic) return;
+function startFarewellMusic(){
+    if(!bgMusic) return;
     bgMusic.currentTime = 0;
     bgMusic.volume = 0.30;
-    bgMusic.play().catch(() => {});
+    bgMusic.play().catch(()=>{});
 }
 
-function stopFarewellMusic() {
-    if (!bgMusic) return;
+function stopFarewellMusic(){
+    if(!bgMusic) return;
     const startVolume = bgMusic.volume || 0.30;
-    const steps = 12;
     let step = 0;
-    const timer = setInterval(() => {
+    const steps = 12;
+    const timer = setInterval(()=>{
         step++;
-        bgMusic.volume = Math.max(0, startVolume * (1 - step / steps));
-        if (step >= steps) {
+        bgMusic.volume = Math.max(0, startVolume * (1 - step/steps));
+        if(step >= steps){
             clearInterval(timer);
             bgMusic.pause();
             bgMusic.currentTime = 0;
@@ -338,6 +330,24 @@ function stopFarewellMusic() {
     }, 180);
 }
 
+</script>
+
+
+<script>
+document.addEventListener("click", function(e) {
+    const btn = e.target.closest("button, .btn, a");
+    if (!btn) return;
+
+    const audio = document.getElementById("clickAudio");
+    if (!audio) return;
+
+    try {
+        audio.pause();
+        audio.currentTime = 0;
+        const p = audio.play();
+        if (p) p.catch(() => {});
+    } catch(err) {}
+}, true);
 </script>
 
 </body>
