@@ -287,7 +287,7 @@ const bgMusic = document.getElementById("bgMusic");
 const clickAudio = document.getElementById("clickAudio");
 
 if (bgMusic) bgMusic.volume = 1;
-if (clickAudio) clickAudio.volume = 0.75;
+if (clickAudio) clickAudio.volume = 0.30;
 
 function playClick(){
     const audio = document.getElementById("clickAudio");
@@ -303,13 +303,13 @@ function playClick(){
 function startFarewellMusic(){
     if(!bgMusic) return;
     bgMusic.currentTime = 0;
-    bgMusic.volume = 0.30;
+    bgMusic.volume = 0.75;
     bgMusic.play().catch(()=>{});
 }
 
 function stopFarewellMusic(){
     if(!bgMusic) return;
-    const startVolume = bgMusic.volume || 0.30;
+    const startVolume = bgMusic.volume || 0.75;
     let step = 0;
     const steps = 12;
     const timer = setInterval(()=>{
@@ -319,7 +319,7 @@ function stopFarewellMusic(){
             clearInterval(timer);
             bgMusic.pause();
             bgMusic.currentTime = 0;
-            bgMusic.volume = 0.30;
+            bgMusic.volume = 0.75;
         }
     }, 180);
 }
